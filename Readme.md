@@ -29,3 +29,8 @@ CONTAINER ID        IMAGE                                     COMMAND           
 
 $ curl localhost:32783/metrics
 ```
+
+Note
+====
+The example is based on the docker registry output and can be used to establish prometheus monitoring
+for a private docker regsitry.
