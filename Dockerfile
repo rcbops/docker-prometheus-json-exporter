@@ -1,20 +1,22 @@
-FROM golang:latest
+FROM golang:1.9 as build
 
-MAINTAINER German Eichberger <german.eichberger@rackspace.com>
-LABEL Description="Provides prometheus json exporter" Version="0.1"
-
-# https://github.com/kawamuray/prometheus-json-exporter
+WORKDIR /go
 
 RUN  git clone https://github.com/kawamuray/prometheus-json-exporter.git \
   && cd prometheus-json-exporter \
   && ./gow get \
-  && ./gow build -o json_exporter . \
-  && mv json_exporter ../bin
+  && CGO_ENABLED=0 GOOS=linux ./gow build -o json_exporter .
+
+
+FROM alpine:3.6
+
+COPY --from=build /go/prometheus-json-exporter/json_exporter /usr/bin/
 
 # Add a volume so that a host filesystem can be mounted
 # Ex. `docker run -v $PWD:/config xgerman/docker-prometheus-json-exporter`
 VOLUME ["/config"]
 EXPOSE 7979
+
 CMD json_exporter $URL /config/config.yml
 
 
